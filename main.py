@@ -7,7 +7,7 @@ import json
 app = Flask(__name__)
 
 df = pd.read_csv('exercise.csv', encoding="cp949")
-data=df[['운동 이름', '유/무산소', '운동 부위', '도구', '단체유무', '장소', '나이', '비만도', '성별', '상장', '운동순서', '순위']]
+data=df[['운동 이름', '유/무산소', '운동 부위', '도구', '단체유무', '장소', '나이', '비만도', '성별', '상장', '운동순서', '순위', 'url']]
 
 counter_vector = CountVectorizer(ngram_range=(1, 3))
 
@@ -40,7 +40,7 @@ def tt(geninfo, ageinfo, bodyinfo, thinginfo, heightinfo, weightinfo):
     else:
         bm = "3단계비만" + ",2단계비만"
 
-    data = df[['운동 이름', '유/무산소', '운동 부위', '도구', '단체유무', '장소', '나이', '비만도', '성별', '상장', '운동순서', '순위']]
+    data = df[['운동 이름', '유/무산소', '운동 부위', '도구', '단체유무', '장소', '나이', '비만도', '성별', '상장', '운동순서', '순위','url']]
     gender_data = df[df['성별'] == gen]
     age_data = gender_data[gender_data['나이'] == age]
 
@@ -120,35 +120,51 @@ def tt(geninfo, ageinfo, bodyinfo, thinginfo, heightinfo, weightinfo):
     in_body = in_body.drop_duplicates(['운동 이름'])  # 유사도 추천
     post_body = post_body.drop_duplicates(['운동 이름'])  # 유사도 추천
 
-    str1 = pre_answer1["운동 이름"].sample(n=1).values
+    str1 = pre_answer1["운동 이름"].head(1).values
+    url1 = pre_answer1["url"].head(1).values
     str2 = pre_body["운동 이름"].head(3).values
+    url2 = pre_body["url"].head(3).values
 
     if (str1[0] == str2[0]):
         str2[0] = str2[1]
+        url2[0] = url2[1]
         str2[1] = str2[2]
+        url2[1] = url2[2]
     elif (str1[0] == str2[1]):
         str2[1] = str2[2]
+        url2[1] = url2[2]
 
-    str3 = in_answer1["운동 이름"].sample(n=1).values
+    str3 = in_answer1["운동 이름"].head(1).values
+    url3 = in_answer1["url"].head(1).values
     str4 = in_body["운동 이름"].head(3).values
+    url4 = in_body["url"].head(3).values
 
     if (str3[0] == str4[0]):
         str4[0] = str4[1]
+        url4[0] = url4[1]
         str4[1] = str4[2]
+        url4[1] = url4[2]
     elif (str3[0] == str4[1]):
         str4[1] = str4[2]
+        url4[1] = url4[2]
 
-    str5 = post_answer1["운동 이름"].sample(n=1).values
+    str5 = post_answer1["운동 이름"].head(1).values
+    url5 = post_answer1["url"].head(1).values
     str6 = post_body["운동 이름"].head(3).values
+    url6 = post_body["url"].head(3).values
 
     if (str5[0] == str6[0]):
         str6[0] = str6[1]
+        url6[0] = url6[1]
         str6[1] = str6[2]
+        url6[1] = url6[2]
     elif (str5[0] == str6[1]):
         str6[1] = str6[2]
+        url6[1] = url6[2]
 
     str = str1[0] + "," + str2[0] + "," + str2[1] + "|" + str3[0] + "," + str4[0] + "," + str4[1] + "|" + str5[0] + "," + str6[0] + "," + str6[1]
-    return str
+    str2 = url1[0] + "," + url2[0] + "," + url2[1] + "|" + url3[0] + "," + url4[0] + "," + url4[1] + "|" + url5[0] + "," + url6[0] + "," + url6[1]
+    return str + "|" + str2
 
 @app.route("/", methods=['GET', 'POST'])
 def handle_request():
